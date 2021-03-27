@@ -87,6 +87,20 @@ jobs:
         with:
           name: stockfish
           path: stockfish-*
+  linux-armv7:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: uraimo/run-on-arch-action@v2.0.5
+        with:
+          arch: armv7
+          distro: ubuntu16.04
+          run: apt-get update && apt-get install -y software-properties-common && add-apt-repository -y ppa:ubuntu-toolchain-r/test && apt-get update && apt-get install -y wget make binutils g++-7 && cd src && CXXFLAGS=-DNNUE_EMBEDDING_OFF make CXX=g++-7 ARCH=armv7 profile-build && strip stockfish && ./stockfish compiler
+      - run: mv ./src/stockfish stockfish-armv7
+      - uses: actions/upload-artifact@v2
+        with:
+          name: stockfish
+          path: stockfish-*
   freebsd:
     strategy:
       matrix:
