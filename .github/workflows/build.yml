@@ -14,10 +14,10 @@ jobs:
       - run: echo "CXXFLAGS=-DNNUE_EMBEDDING_OFF" >> $GITHUB_ENV
       - run: cd src && make CXX=g++-7 ARCH=${{ matrix.arch }} profile-build && strip stockfish
       - run: ./src/stockfish compiler
-      - run: mv ./src/stockfish stockfish-mv-${{ matrix.arch }}
+      - run: mv ./src/stockfish stockfish-${{ matrix.arch }}
       - uses: actions/upload-artifact@v2
         with:
-          name: stockfish-mv
+          name: stockfish
           path: stockfish-*
   windows:
     strategy:
@@ -29,10 +29,10 @@ jobs:
       - run: echo "CXXFLAGS=-DNNUE_EMBEDDING_OFF" >> ${env:GITHUB_ENV}
       - run: cd src && make ARCH=${{ matrix.arch }} COMP=mingw profile-build && strip stockfish.exe
       - run: ./src/stockfish compiler
-      - run: mv ./src/stockfish.exe stockfish-mv-${{ matrix.arch }}.exe
+      - run: mv ./src/stockfish.exe stockfish-${{ matrix.arch }}.exe
       - uses: actions/upload-artifact@v2
         with:
-          name: stockfish-mv
+          name: stockfish
           path: stockfish-*
   macos:
     strategy:
@@ -57,10 +57,10 @@ jobs:
       - run: cd src && make ARCH=${{ matrix.arch }} ${{ matrix.build }} && strip stockfish
       - run: ./src/stockfish compiler
         if: ${{ matrix.build == 'profile-build' }}
-      - run: mv ./src/stockfish stockfish-mv-macos-${{ matrix.arch }}
+      - run: mv ./src/stockfish stockfish-macos-${{ matrix.arch }}
       - uses: actions/upload-artifact@v2
         with:
-          name: stockfish-mv
+          name: stockfish
           path: stockfish-*
   macos-aarch64:
     runs-on: macos-11.0
@@ -68,10 +68,10 @@ jobs:
       - uses: actions/checkout@v2
       - run: echo "CXXFLAGS=-DNNUE_EMBEDDING_OFF -target arm64-apple-macos11" >> $GITHUB_ENV
       - run: cd src && make ARCH=apple-silicon build && strip stockfish
-      - run: mv ./src/stockfish stockfish-mv-macos-aarch64
+      - run: mv ./src/stockfish stockfish-macos-aarch64
       - uses: actions/upload-artifact@v2
         with:
-          name: stockfish-mv
+          name: stockfish
           path: stockfish-*
   linux-aarch64:
     runs-on: ubuntu-16.04
@@ -82,10 +82,24 @@ jobs:
           arch: aarch64
           distro: ubuntu16.04
           run: apt-get update && apt-get install -y software-properties-common && add-apt-repository -y ppa:ubuntu-toolchain-r/test && apt-get update && apt-get install -y wget make binutils g++-7 && cd src && CXXFLAGS=-DNNUE_EMBEDDING_OFF make CXX=g++-7 ARCH=armv8 profile-build && strip stockfish && ./stockfish compiler
-      - run: mv ./src/stockfish stockfish-mv-aarch64
+      - run: mv ./src/stockfish stockfish-aarch64
       - uses: actions/upload-artifact@v2
         with:
-          name: stockfish-mv
+          name: stockfish
+          path: stockfish-*
+  linux-armv7:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: uraimo/run-on-arch-action@v2.0.5
+        with:
+          arch: armv7
+          distro: ubuntu16.04
+          run: apt-get update && apt-get install -y software-properties-common && add-apt-repository -y ppa:ubuntu-toolchain-r/test && apt-get update && apt-get install -y wget make binutils g++-7 && cd src && CXXFLAGS=-DNNUE_EMBEDDING_OFF make CXX=g++-7 ARCH=armv7 profile-build && strip stockfish && ./stockfish compiler
+      - run: mv ./src/stockfish stockfish-armv7
+      - uses: actions/upload-artifact@v2
+        with:
+          name: stockfish
           path: stockfish-*
   freebsd:
     strategy:
@@ -109,8 +123,8 @@ jobs:
       - uses: niklasf/freebsd-vm@main
         with:
           run: pkg install -y gmake curl && cd src && env CXXFLAGS=-DNNUE_EMBEDDING_OFF gmake ARCH=${{ matrix.arch }} COMP=clang ${{ matrix.build }} && strip stockfish
-      - run: mv ./src/stockfish stockfish-mv-freebsd-${{ matrix.arch }}
+      - run: mv ./src/stockfish stockfish-freebsd-${{ matrix.arch }}
       - uses: actions/upload-artifact@v2
         with:
-          name: stockfish-mv
+          name: stockfish
           path: stockfish-*
